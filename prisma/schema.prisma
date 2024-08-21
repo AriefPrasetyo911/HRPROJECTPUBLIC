@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  name       String     @db.VarChar(45)
+  email      String     @unique(map: "email_UNIQUE") @db.VarChar(45)
+  password   String     @db.VarChar(200)
+  role       Role       @relation(references: [id], fields: [roleId])
+  roleId     Int        @unique
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+}
+
+// enum UserRole {
+//   DEV
+//   HR
+//   SUPERVISOR
+//   EMPLOYEE
+// }
+
+model Role{
+  id                      Int         @id @default(autoincrement())
+  name                    String      @unique
+  // users                   User        @relation(fields: [user_id],references: [id])
+  // user_id                 Int         @unique
+  users                   User? 
+  created_at              DateTime    @default(now())
+  updated_at              DateTime?    @updatedAt
+}
+
+model employee_data{
+  id                      Int         @id @default(autoincrement())
+  employee_id             String      @db.VarChar(255)
+  employee_full_name      String      @db.VarChar(255)
+  gender                  String      @db.VarChar(50)
+  job_title               String      @db.VarChar(255)
+  department              String      @db.VarChar(255)
+  email                   String      @unique(map: "email_UNIQUE")  @db.VarChar(155)
+  phone_number            String      @db.VarChar(255)
+  join_date               String      @db.VarChar(255)
+  nationality             String      @db.VarChar(255)
+  date_completion         String?     
+  appraisal_status        String?     
+  supervisor_name         String?     
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+}
+
+model Performance_appraisal_category{
+  id                      Int         @id @default(autoincrement())
+  question_category       String      @db.Text
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+  question_examples       Performance_appraisal_examples[]
+}
+
+model Performance_appraisal_examples{
+  id                      Int         @id @default(autoincrement())
+  question_category_id    Int         @db.Int
+  question_example        String      @db.Text
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+  question_category       Performance_appraisal_category     @relation(fields: [question_category_id], references: [id], onDelete: Cascade)
+}
+
+model Performance_appraisal_question_answer{
+  id                      Int         @id @default(autoincrement())
+  employee_id             String      @db.VarChar(255)
+  question_id             String      @db.VarChar(255)
+  answer                  String      @db.VarChar(150)
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+}
+
+model Performance_appraisal_question_comment{
+  id                      Int         @id @default(autoincrement())
+  employee_id             String      @db.VarChar(255)
+  question_id             String      @db.VarChar(255)
+  comment                 String      @db.Text
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+}
+
+model Performance_appraisal_result{
+  id                      Int         @id @default(autoincrement())
+  employee_id             String      @db.VarChar(255)
+  // answer_id               String      @db.VarChar(255)
+  question_category       String      @db.Text
+  question_example        String      @db.Text
+  answer_point            Int         @db.Int
+  status                  String      @db.VarChar(255)
+  year                    Int         @db.Int
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+}
+
+model Performance_appraisal_year{
+  id                      Int         @id @default(autoincrement())
+  year                    Int         @db.Int
+  evaluation_period       String      @db.VarChar(255)
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+}
+
+model Supervisor{
+  id                      Int         @id @default(autoincrement())
+  name                    String      @db.VarChar(255)
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+}
+
+model Performance_appraisal_employee_year{
+  id                      Int         @id @default(autoincrement())
+  employee_id             String      @db.VarChar(255)
+  evaluation_year         Int         @db.Int
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+}
+
+model Employee_photo{
+  id                      Int         @id @default(autoincrement())
+  // emp_id                  Int         @unique(map: "emp_id_UNIQUE")  @db.Int()
+  employee_id             String      @db.VarChar(255)
+  photo                   String      @db.Text
+  file_path               String      @db.Text
+  created_at              DateTime    @default(now())
+  updated_at              DateTime    @updatedAt
+}
+
+
+// model Permission {
+//   id                      Int         @id @default(autoincrement())
+//   role                    Role        @relation(fields: [role_id], references: [id], onDelete: Cascade)
+//   role_id                 Int         @db.Int
+//   action                  String      @db.VarChar(255)
+//   subject                 String      @db.VarChar(255)
+//   inverted                Boolean     @default(false)
+//   condition               Json?       @db.JsonB
+// }
